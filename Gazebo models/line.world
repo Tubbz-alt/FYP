@@ -678,9 +678,9 @@
       <pose>11 3 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>1002 471000000</sim_time>
-      <real_time>60 857105500</real_time>
-      <wall_time>1492478849 988175556</wall_time>
+      <sim_time>4306 864000000</sim_time>
+      <real_time>3311 87923778</real_time>
+      <wall_time>1492523037 412566035</wall_time>
       <model name='BuildingDefaultName'>
         <pose>0 0 0 0 -0 0</pose>
         <link name='__default__'>
@@ -931,18 +931,18 @@
         </link>
       </model>
       <model name='quadrotor'>
-        <pose>-1.8e-05 -1.5e-05 0.039994 0 5.9e-05 -3.4e-05</pose>
+        <pose>-12.6658 -26.7495 0.039996 4.23516e-22 4e-05 -0.048143</pose>
         <link name='base_link'>
-          <pose>-1.8e-05 -1.5e-05 0.039994 0 5.9e-05 -3.4e-05</pose>
-          <velocity>0.003959 -1e-06 -9.6e-05 1.2e-05 0.09896 0</velocity>
-          <acceleration>5.55108 -0.00086 5.39739 0.000189 1.33584 -1.6e-05</acceleration>
-          <wrench>8.32662 -0.00129 8.09609 0 -0 0</wrench>
+          <pose>-12.6658 -26.7495 0.039996 4.23516e-22 4e-05 -0.048143</pose>
+          <velocity>0.003218 -0.000156 -5.8e-05 0.00389 0.08043 -1e-06</velocity>
+          <acceleration>4.86371 -0.235687 3.53073 0.053689 1.17039 -8.6e-05</acceleration>
+          <wrench>7.29556 -0.35353 5.2961 0 -0 0</wrench>
         </link>
       </model>
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>50.0958 -50.9127 103.283 1.05008e-16 1.0138 1.86184</pose>
+        <pose>-28.9885 -28.1473 8.52307 4.44974e-19 0.225772 -0.018194</pose>
         <view_controller>orbit</view_controller>
       </camera>
     </gui>
@@ -2339,6 +2339,30 @@
         <gravity>1</gravity>
       </link>
       <static>1</static>
+    </model>
+    <model name='BuildingDefaultName'>
+      <static>1</static>
+      <link name='__default__'>
+        <velocity_decay>
+          <linear>0</linear>
+          <angular>0</angular>
+        </velocity_decay>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+    </model>
+    <model name='BuildingDefaultName'>
+      <static>1</static>
+      <link name='__default__'>
+        <velocity_decay>
+          <linear>0</linear>
+          <angular>0</angular>
+        </velocity_decay>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
     </model>
   </world>
 </sdf>
