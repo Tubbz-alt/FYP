@@ -3,18 +3,19 @@ from PIL import Image, ImageOps
 import numpy as np
 import glob
 
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D
-from keras.utils import np_utils
-from keras.optimizers import SGD, adam, adadelta
-from keras.models import load_model
-from keras.callbacks import EarlyStopping
+from keras.layers import Input, Dropout, Flatten, Convolution2D, MaxPooling2D, BatchNormalization, Dense
+from keras.optimizers import RMSprop
+from keras.callbacks import ModelCheckpoint, Callback, EarlyStopping
 from keras import backend as K
+
 import matplotlib.pyplot as plt
 
 batch_size = 5
-nb_epoch = 30
+nb_epoch = 21
 
 # input image dimensions for training
 img_rows, img_cols = 220, 180
@@ -48,17 +49,22 @@ def load_data():
 	print(Y.shape)
 
 	# Shuffle (X,Y)
-	randomize = np.arange(len(Y))
-	np.random.shuffle(randomize)
-	X, Y = X[randomize], Y[randomize]
+	#randomize = np.arange(len(Y))
+	#np.random.shuffle(randomize)
+	#X, Y = X[randomize], Y[randomize]
 
-	n_partition = int(n*0.9)	# Train 90% and Test 10%
+	#n_partition = int(n*0.9)	# Train 90% and Test 10%
 
-	X_train = X[:n_partition]
-	Y_train = Y[:n_partition]
+	#X_train = X[:n_partition]
+	#Y_train = Y[:n_partition]
 
-	X_test  = X[n_partition:]
-	Y_test  = Y[n_partition:]
+	#X_test  = X[n_partition:]
+	#Y_test  = Y[n_partition:]
+
+
+	### Creating Validation Data
+	X_train, X_test, Y_train, Y_test = train_test_split(
+    X, Y, test_size=0.20, random_state=23)
 
 	return X_train, Y_train, X_test, Y_test, input_shape
 
@@ -74,38 +80,52 @@ print(nb_epoch,'epochs')
 # Neural Network Structure
 #
 def create_model():
+	lr = 0.0001
+	weight_init='glorot_normal'
+	opt = RMSprop(lr)
+	loss = 'mean_squared_error'
+
 	model = Sequential()
-	# first set of CONV => RELU => POOL
-	model.add(Convolution2D(20, 5, 5, border_mode="same",
-	input_shape=(input_shape)))
-	model.add(Activation("relu"))
-	model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-	model.add(Dropout(0.1))
 
-	# second set of CONV => RELU => POOL
-	model.add(Convolution2D(50, 5, 5, border_mode="same"))
-	model.add(Activation("relu"))
-	model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-	model.add(Dropout(0.5))
+	model.add(BatchNormalization(mode=2, axis=1, input_shape=(img_rows, img_cols, 3)))
+	model.add(Convolution2D(3, 3, 3, init=weight_init, border_mode='valid', activation='relu', input_shape=(img_rows, img_cols, 3)))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
 
-	# set of FC => RELU layers
+	model.add(Convolution2D(9, 3, 3, init=weight_init, border_mode='valid', activation='relu'))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+
+	model.add(Convolution2D(18, 3, 3, init=weight_init, border_mode='valid', activation='relu'))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+
+	model.add(Convolution2D(32, 3, 3, init=weight_init, border_mode='valid',  activation='relu'))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+
 	model.add(Flatten())
-	model.add(Dense(250))
-	model.add(Activation("relu"))
+	model.add(Dense(80, activation='relu', init=weight_init))
 
-	# softmax classifier
-	model.add(Dense(6))
-	model.add(Activation("softmax"))
-	##model.summary()
+	model.add(Dense(15, activation='relu', init=weight_init))
 
+	model.add(Dropout(0.25))
+	model.add(Dense(6, init=weight_init, activation='linear'))
+
+	model.compile(optimizer=opt, loss=loss)
 	return model
 
 
-optimizer = SGD(lr = 0.01,momentum=0.1,nesterov = False)
+model = create_model()
+# Callbacks
+early_stopping = EarlyStopping(monitor='val_loss', patience=8, verbose=1, mode='auto')
+save_weights = ModelCheckpoint('model.h5', monitor='val_loss', save_best_only=True)
+
+history = model.fit(X_train, Y_train, batch_size = batch_size, nb_epoch = nb_epoch,
+	verbose = 1, validation_data = (X_test, Y_test), callbacks=[save_weights, early_stopping])
+
+'''
+optimizer = SGD(lr = 0.001,momentum=0.1,nesterov = False)
 early_stopping = EarlyStopping(monitor='loss', patience=3)
 #model = load_model('homus_cnn.h5')
 model = create_model()
-model.compile(loss = 'mean_squared_error',optimizer = optimizer, metrics = ['accuracy'])
+#model.compile(loss = 'mean_squared_error',optimizer = optimizer, metrics = ['accuracy'])
 
 history = model.fit(X_train, Y_train, batch_size = batch_size, nb_epoch = nb_epoch,
 	verbose = 1, validation_data = (X_test, Y_test), callbacks=[early_stopping])
@@ -136,9 +156,11 @@ plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper left')
 plt.show()
-
+'''
 # file name to save model
-filename = 'drone_lenet.h5'
+#filename = 'drone_lenet.h5'
+
+filename = 'model.h5'
 
 # save network model
 model.save(filename)
