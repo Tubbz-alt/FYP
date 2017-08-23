@@ -103,6 +103,7 @@ def create_model():
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 
 	model.add(Flatten())
+	# normalizacion
 	model.add(Dense(80, activation='relu', init=weight_init))
 
 	model.add(Dense(15, activation='relu', init=weight_init))
