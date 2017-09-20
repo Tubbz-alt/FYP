@@ -1,0 +1,8 @@
+prefix=/home/miguel/joy_ws/install
+
+Name: ardrone_joystick
+Description: Description of ardrone_joystick
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/miguel/joy_ws/install/lib 
+Requires: 

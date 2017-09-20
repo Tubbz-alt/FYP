@@ -1,0 +1,8 @@
+prefix=/home/miguel/tum_simulator_ws/devel
+
+Name: deep_navigation
+Description: Description of deep_navigation
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/miguel/tum_simulator_ws/devel/lib 
+Requires: 
