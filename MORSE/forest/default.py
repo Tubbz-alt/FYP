@@ -7,56 +7,37 @@ Feel free to edit this template as you like!
 
 from morse.builder import *
 
-# Add the MORSE mascott, MORSY.
-# Out-the-box available robots are listed here:
-# http://www.openrobots.org/morse/doc/stable/components_library.html
-#
-# 'morse add robot <name> forest' can help you to build custom robots.
-robot = Morsy()
 
-# The list of the main methods to manipulate your components
-# is here: http://www.openrobots.org/morse/doc/stable/user/builder_overview.html
-robot.translate(3.0, 0.0, -4.0)
-robot.rotate(0.0, 0.0, 1.57)
+quadrotor = Quadrotor()
 
-# Add a motion controller
-# Check here the other available actuators:
-# http://www.openrobots.org/morse/doc/stable/components_library.html#actuators
-#
-# 'morse add actuator <name> forest' can help you with the creation of a custom
-# actuator.
+
+quadrotor.translate(3.0, 0.0, -4.0)
+quadrotor.rotate(0.0, 0.0, 1.57)
+
 motion = MotionVW()
-robot.append(motion)
+quadrotor.append(motion)
 
 
-# Add a keyboard controller to move the robot with arrow keys.
 keyboard = Keyboard()
-robot.append(keyboard)
+quadrotor.append(keyboard)
 keyboard.properties(ControlType = 'Position')
 
-# Add a pose sensor that exports the current location and orientation
-# of the robot in the world frame
-# Check here the other available actuators:
-# http://www.openrobots.org/morse/doc/stable/components_library.html#sensors
-#
-# 'morse add sensor <name> forest' can help you with the creation of a custom
-# sensor.
 pose = Pose()
 # place your component at the correct location
 pose.translate(3.0, 0.0, -4.0)
 pose.rotate(0.0, 0.0, 1.57)
 
-robot.append(pose)
+quadrotor.append(pose)
 
-# define one or several communication interface, like 'socket'
+camera = VideoCamera()
+
+camera.translate(3.0, 0.0, -4.0)
+camera.rotate(0.0, 0.0, 1.57)
+quadrotor.append(camera)
+# camera.properties(cam_far=800)
+camera.add_stream('socket')  # for external Python script
 pose.add_interface('socket')
-
-
-# To ease development and debugging, we add a socket interface to our robot.
-#
-# Check here: http://www.openrobots.org/morse/doc/stable/user/integration.html 
-# the other available interfaces (like ROS, YARP...)
-robot.add_default_interface('socket')
+quadrotor.add_default_interface('socket')
 
 
 # set 'fastmode' to True to switch to wireframe mode
