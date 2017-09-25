@@ -14,15 +14,22 @@ quadrotor = Quadrotor()
 quadrotor.translate(3.0, 0.0, 15)
 quadrotor.rotate(0.0, 0.0, pi/2)
 
-motion = MotionVW()
-quadrotor.append(motion)
-
 ######## KEYBOARD ########
 
-keyboard = Keyboard()
+#keyboard = Keyboard()
 
-quadrotor.append(keyboard)
-keyboard.properties(ControlType = 'Position')
+#quadrotor.append(keyboard)
+#keyboard.properties(ControlType = 'Position')
+
+######## CAMERA ########
+
+camera = VideoCamera()
+
+camera.translate(0.32, 0.0, 0.0)
+camera.rotate(0.0, 0.0, pi/2)
+quadrotor.append(camera)
+camera.add_interface('socket')
+# camera.properties(cam_far=800)
 
 ######## POSE ########
 
@@ -30,45 +37,21 @@ pose = Pose()
 
 #pose.translate(3.0, 0.0, -4.0)
 pose.rotate(0.0, 0.0, pi/2)
-
 quadrotor.append(pose)
+pose.add_interface('socket')
 
-######## CAMERA ########
+######## MOTION HANDLER ########
 
-camera = VideoCamera()
+motion = MotionVW()
 
-camera.translate(0.0, -0.31, 0.0)
-camera.rotate(0.0, 0.0, pi/2)
-
-quadrotor.append(camera)
-# camera.properties(cam_far=800)
+quadrotor.append(motion)
+motion.add_interface('socket')
 
 ######## ORIENTATION HANDLER ########
 
-# creates a new instance of the actuator
 orientation = Orientation()
-
-#orientation.translate(3.0, 0.0, -4.0)
-#orientation.rotate(0.0, 0.0, pi/2)
-
 quadrotor.append(orientation)
-
-######## VELOCITY HANDLER ########
-
-velocity = RotorcraftVelocity()
-
-#velocity.translate(3.0, 0.0, -4.0)
-velocity.rotate(0.0, 0.0, pi/2)
-
-quadrotor.append(velocity)
-
-######## STREAMS ########
-
-camera.add_stream('socket')
-pose.add_interface('socket')
-orientation.add_stream('socket')
-velocity.add_interface('socket')
-quadrotor.add_default_interface('socket')
+orientation.add_interface('socket')
 
 ######## ENVIRONMENT ########
 
