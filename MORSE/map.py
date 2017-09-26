@@ -1,3 +1,5 @@
+# Created by: Miguel Sancho
+
 import sys
 import numpy as np
 import math
@@ -17,24 +19,24 @@ class Map:
 
     def getPoint(self, x, y):
         if x < 0:
-          x = 81 - abs(x)
+          x = 81 + abs(x)
         else:
-          x = 81 + x
+          x = 81 - x
 
         if y < 0:
           y = 80 + abs(y)
         else:
           y = 80 - y  
 
-        return self.map[y][x]
+        return self.map[x][y]
 
     def getDirection(self, x, y):
         dir = self.getPoint(x, y)
 
         if dir < 180:
-            dir = math.radians(dir)
+            dir = -(math.radians(dir))
         else: 
-            dir = -(math.radians(360 - dir))
+            dir = -math.radians(360 - dir)
 
         return dir
 
@@ -47,7 +49,7 @@ def main(args):
   print(map.getDirection(2,73))
   print(map.getPoint(-3,75))
   print(map.getDirection(-3,75))
-  print(map.getPoint(27,80))  
+  print(map.getPoint(80,2))  
   print(map.getDirection(27,80))
 
 

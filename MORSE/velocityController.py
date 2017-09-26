@@ -1,3 +1,5 @@
+# Created by: Miguel Sancho
+
 from pymorse import Morse
 
 i = 0

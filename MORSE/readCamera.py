@@ -1,3 +1,5 @@
+# Created by: Miguel Sancho
+
 import base64
 import numpy
 import cv2
