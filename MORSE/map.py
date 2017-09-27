@@ -32,13 +32,14 @@ class Map:
 
     def getDirection(self, x, y):
         dir = self.getPoint(x, y)
+        toNp = int(dir/45)
 
         if dir < 180:
             dir = -(math.radians(dir))
         else: 
-            dir = -math.radians(360 - dir)
+            dir = math.radians(360 - dir)
 
-        return dir
+        return {"rads": dir, "dir": toNp}
 
 
 
@@ -46,7 +47,6 @@ def main(args):
   map = Map()
   map.loadMap("maps/pruebaAgua.csv")
   map.toImage()
-  print(map.getDirection(2,73))
   print(map.getPoint(-3,75))
   print(map.getDirection(-3,75))
   print(map.getPoint(80,2))  

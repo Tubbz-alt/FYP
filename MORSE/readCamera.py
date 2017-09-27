@@ -11,6 +11,7 @@ from scipy.misc import imsave
 while True:
   with Morse() as sim:
     data = sim.quadrotor.camera.get()
+    
 
   width = data['width']
   height = data['height']

@@ -7,7 +7,7 @@ from math import pi
 
 quadrotor = Quadrotor()
 
-quadrotor.translate(0.0, 60.0, 15)
+quadrotor.translate(0.0, -60, 15)
 #quadrotor.rotate(0.0, 0.0, pi/2)
 
 ######## KEYBOARD ########
@@ -55,6 +55,6 @@ orientation.add_interface('socket')
 
 # set 'fastmode' to True to switch to wireframe mode
 env = Environment('models/plane.blend', fastmode = False)
-env.set_camera_location([-18.0, 60.0, 19.8])
+env.set_camera_location([-18.0, -60.0, 19.8])
 env.set_camera_rotation([1.09, 0, -1.14])
 
