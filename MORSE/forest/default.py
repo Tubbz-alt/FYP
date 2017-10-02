@@ -19,13 +19,13 @@ quadrotor.translate(0.0, -60, 15)
 
 ######## CAMERA ########
 
-camera = VideoCamera()
+camera = VideoCamera() # H & W = 256
 
 camera.translate(0.32, 0.0, 0.0)
 #camera.rotate(0.0, 0.0, pi/2)
 quadrotor.append(camera)
 camera.add_interface('socket')
-# camera.properties(cam_far=800)
+camera.properties(cam_far=800)
 
 ######## POSE ########
 

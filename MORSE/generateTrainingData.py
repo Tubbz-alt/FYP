@@ -8,8 +8,12 @@ from pymorse import Morse
 from map import *
 from math import pi
 
+def checkLimit(pose):
+	None
+
+
 i = 0
-f = open('data.txt','w')
+f = open('trainingData/data.txt','w')
 
 map = Map()
 map.loadMap("maps/pruebaAgua.csv")
@@ -27,8 +31,11 @@ with Morse() as morse:
     while True:
         camera = morse.quadrotor.camera.get()
         quadPose = morse.quadrotor.pose.get()
-        direction = map.getDirection(round(quadPose['x']), round(quadPose['y']))
-        print("Location X,Y :({} , {}) Direction: {}".format(quadPose['x'], quadPose['y'], direction))
+        x = quadPose['x']
+        y = quadPose['y']
+
+        direction = map.getDirection(round(x), round(y))
+        print("Location X,Y :({} , {}) Direction: {}".format(x, y, direction))
 
         orientation = { "yaw": direction['rads'], \
                         "pitch": 0, \
@@ -36,8 +43,8 @@ with Morse() as morse:
                       }
         quadDir.publish(orientation)
 
-        width = camera['width']
-        height = camera['height']
+        width = camera['width'] # 256 default
+        height = camera['height'] # 256 default
         buff = base64.b64decode(camera['image'])  # RGBA base64 encoded
 
         image = numpy.ndarray(shape=(height, width, 4), buffer=buff, dtype='uint8')
