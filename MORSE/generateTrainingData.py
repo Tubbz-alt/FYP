@@ -1,16 +1,41 @@
 # Created by: Miguel Sancho
 
+import mathutils
 import base64
 import numpy
 import cv2
 
-from pymorse import Morse
 from map import *
 from math import pi
+from pymorse import Morse
+from random import randint
 
-def checkLimit(pose):
-	None
+def checkLimit(x, y):
+    if x > 30:
+        return True
+    else:
+        return False
 
+def teleport(quadTele):
+    x = randint(-43, 32)
+    y = randint(-48, 46)
+
+    morse.deactivate('quadrotor.motion')
+    morse.activate('quadrotor.teleport')
+
+    destination = { "x": x, \
+                    "y": y, \
+                    "z": 15, \
+                    "yaw": 0, \
+                    "pitch": 0, \
+                    "roll": 0, \
+                   }
+    quadTele.publish(destination)
+    
+    morse.deactivate('quadrotor.teleport')
+    morse.activate('quadrotor.motion')
+    
+    
 
 i = 0
 f = open('trainingData/data.txt','w')
@@ -19,10 +44,12 @@ map = Map()
 map.loadMap("maps/pruebaAgua.csv")
 
 with Morse() as morse:
+    morse.deactivate('quadrotor.teleport')
+    quadTele = morse.quadrotor.teleport
     quadVel = morse.quadrotor.motion
     quadDir = morse.quadrotor.orientation
 
-    vel = { "v": 1, \
+    vel = { "v": 2, \
             "w": 0, \
           }
     
@@ -58,6 +85,10 @@ with Morse() as morse:
 
         if cv2.waitKey(1) & 0xff == ord('q'):
             break
+        
+        if checkLimit(x, y):
+            teleport(quadTele)
+
         i = i + 1
 cv2.destroyAllWindows()
 

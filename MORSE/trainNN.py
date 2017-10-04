@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from dataManager import *
 
 
-batch_size = 16
+batch_size = 30
 nb_classes = 8
 nb_epoch = 30
 dataManager = dataManager()
@@ -98,7 +98,7 @@ plt.legend(['train', 'test'], loc='upper left')
 plt.show()
 
 # file name to save model
-filename = 'homus_cnn.h5'
+filename = 'plane.h5'
 
 # save network model
 model.save(filename)
