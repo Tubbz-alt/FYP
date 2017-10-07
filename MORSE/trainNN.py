@@ -14,15 +14,14 @@ from keras import backend as K
 import matplotlib.pyplot as plt
 
 from dataManager import *
+from resnet50 import *
 
 
 batch_size = 30
-nb_classes = 8
-nb_epoch = 30
+classes = 8
+nb_epoch = 4
 dataManager = dataManager()
 dataManager.newDataSet()
-
-img_rows, img_cols = 256, 256
 
 X_train, Y_train, X_test, Y_test, input_shape = dataManager.getTrainingData()
 
@@ -31,71 +30,20 @@ print(X_test.shape, 'test samples')
 print(input_shape,'input_shape')
 print(nb_epoch,'epochs')
 
-#
-# Neural Network Structure
-#
-def create_model():
-	model = Sequential()
-	# first set of CONV => RELU => POOL
-	model.add(Convolution2D(20, 5, 5, border_mode="same",
-	input_shape=(input_shape)))
-	model.add(Activation("relu"))
-	model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+model = ResNet50(include_top=True, weights=None,
+             input_tensor=None, input_shape=None,
+             pooling=None,
+             classes=8)
 
-	# second set of CONV => RELU => POOL
-	model.add(Convolution2D(50, 5, 5, border_mode="same"))
-	model.add(Activation("relu"))
-	model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-	model.add(Dropout(0.5)) # reducing overfitting
+#optimizer = SGD(lr = 0.01,momentum=0.1,nesterov = False)
 
-	# set of FC => RELU layers
-	model.add(Flatten())
-	model.add(Dense(500))
-	model.add(Activation("relu"))
+early_stopping = EarlyStopping(monitor='loss', patience=1)
 
-	# softmax classifier
-	model.add(Dense(nb_classes))
-	model.add(Activation("softmax"))
-	##model.summary()
-
-	return model
-
-
-optimizer = SGD(lr = 0.01,momentum=0.1,nesterov = False)
-early_stopping = EarlyStopping(monitor='loss', patience=3)
-#model = load_model('homus_cnn.h5')
-model = create_model()
-model.compile(loss = 'categorical_crossentropy',optimizer = optimizer, metrics = ['accuracy'])
+model.compile(loss = 'categorical_crossentropy',optimizer = 'adam', metrics = ['accuracy'])
 
 history = model.fit(X_train, Y_train, batch_size = batch_size, nb_epoch = nb_epoch,
-	verbose = 2, validation_data = (X_test, Y_test), callbacks=[early_stopping])
+	verbose = 1, validation_data = (X_test, Y_test), callbacks=[early_stopping])
 score = model.evaluate(X_test, Y_test, verbose = 1)
-
-#
-# Results
-#
-
-print('Test score:', score[0])
-print('Test accuracy:', score[1])
-
-# list all data in history
-print(history.history.keys())
-# summarize history for accuracy
-plt.plot(history.history['acc'])
-plt.plot(history.history['val_acc'])
-plt.title('model accuracy')
-plt.ylabel('accuracy')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'], loc='upper left')
-plt.show()
-# summarize history for loss
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.title('model loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'], loc='upper left')
-plt.show()
 
 # file name to save model
 filename = 'plane.h5'

@@ -1,5 +1,6 @@
 # Created by: Miguel Sancho
 
+import cv2
 import sys
 import numpy as np
 from PIL import Image
@@ -9,8 +10,8 @@ from sklearn.model_selection import train_test_split
 class dataManager:
     X = None
     Y = None
-    img_rows = 256
-    img_cols = 256
+    img_rows = 224
+    img_cols = 224
 
     def newDataSet(self):
         image_list = []
@@ -18,11 +19,13 @@ class dataManager:
         f = open('trainingData/data.txt', 'r')
         for line in f:
             dataLine = line.split(' ', 2)
-            im = Image.open(dataLine[0])
+            #im = Image.open(dataLine[0])
             #im = Image.open(dataLine[0]).resize((img_rows,img_cols)) # resize
             #im = Image.open(dataLine[0]).resize((img_rows,img_cols)).convert('L') # B & W
+            image = cv2.imread(dataLine[0])
+            image = cv2.resize(image, (self.img_rows, self.img_cols))
             outputs = [dataLine[1]]
-            image_list.append(np.asarray(im).astype('float32')/255)
+            image_list.append(np.array(image))
             output_list.append(np.array(outputs))
 
         n = len(image_list)	# Total examples

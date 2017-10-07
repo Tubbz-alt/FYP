@@ -31,15 +31,15 @@ class Map:
         return self.map[x][y]
 
     def getDirection(self, x, y):
-        dir = self.getPoint(x, y)
-        toNp = int(dir/45)
+        direction = self.getPoint(x, y)
+        toNp = int(direction/45)
 
-        if dir < 180:
-            dir = -(math.radians(dir))
+        if direction < 180:
+            direction = -(math.radians(direction))
         else: 
-            dir = math.radians(360 - dir)
+            direction = math.radians(360 - direction)
 
-        return {"rads": dir, "dir": toNp}
+        return {"rads": direction, "dir": toNp}
 
 
 

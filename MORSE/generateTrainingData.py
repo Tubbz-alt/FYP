@@ -10,6 +10,12 @@ from math import pi
 from pymorse import Morse
 from random import randint
 
+def startQuadrotor(quadVel):
+    vel = { "v": 2, \
+            "w": 0, \
+          }
+    quadVel.publish(vel)
+
 def checkLimit(x, y):
     if x > 30:
         return True
@@ -35,7 +41,7 @@ def teleport(quadTele):
     morse.deactivate('quadrotor.teleport')
     morse.activate('quadrotor.motion')
     
-    
+############################################################    
 
 i = 0
 f = open('trainingData/data.txt','w')
@@ -48,13 +54,9 @@ with Morse() as morse:
     quadTele = morse.quadrotor.teleport
     quadVel = morse.quadrotor.motion
     quadDir = morse.quadrotor.orientation
+    
+    startQuadrotor(quadVel)
 
-    vel = { "v": 2, \
-            "w": 0, \
-          }
-    
-    quadVel.publish(vel)
-    
     while True:
         camera = morse.quadrotor.camera.get()
         quadPose = morse.quadrotor.pose.get()
@@ -77,7 +79,7 @@ with Morse() as morse:
         image = numpy.ndarray(shape=(height, width, 4), buffer=buff, dtype='uint8')
         image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
         # image = cv2.resize(image, (512, 512))
-        cv2.imshow("Robot view", image)
+        cv2.imshow("Quadrotor view", image)
 
         fileName = 'trainingData/'+str(i)+'.jpg'
         cv2.imwrite(fileName, image)
@@ -90,5 +92,6 @@ with Morse() as morse:
             teleport(quadTele)
 
         i = i + 1
+
 cv2.destroyAllWindows()
 
