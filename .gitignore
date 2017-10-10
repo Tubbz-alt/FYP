@@ -2,3 +2,4 @@
 MORSE/forest/models/*
 MORSE/trainingData/*
 MORSE/trainings/*
+MORSE/__pycache__

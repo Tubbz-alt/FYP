@@ -8,10 +8,11 @@ from keras.utils import np_utils
 from sklearn.model_selection import train_test_split
 
 class dataManager:
-    X = None
-    Y = None
-    img_rows = 224
-    img_cols = 224
+    def __init__(self):
+        self.X = None
+        self.Y = None
+        self.img_rows = 224
+        self.img_cols = 224
 
     def newDataSet(self):
         image_list = []
@@ -32,7 +33,7 @@ class dataManager:
         print("total images: {}".format(n))
 
         self.X = np.asarray(image_list).reshape(n,self.img_rows,self.img_cols,3)
-        self.Y = np_utils.to_categorical(np.asarray(output_list), 8)
+        self.Y = np_utils.to_categorical(np.asarray(output_list), 18)
 
         print(self.X.shape)
         print(self.Y.shape)

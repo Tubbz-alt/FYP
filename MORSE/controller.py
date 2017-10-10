@@ -39,8 +39,7 @@ class ControllerNode:
     def predict(self, data):
         image = np.array(data).reshape(1, self.img_rows, self.img_cols, 3)
         prediction = self.model.predict(image)
-        print(prediction.argmax(1)[0])
-        deg = prediction.argmax(1)[0] * 45
+        deg = prediction.argmax(1)[0] * 20
         rads = self.toRads(deg)
 
         return { "yaw": rads, "pitch": 0, "roll": 0 }

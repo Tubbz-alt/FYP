@@ -32,7 +32,7 @@ class Map:
 
     def getDirection(self, x, y):
         direction = self.getPoint(x, y)
-        toNp = int(direction/45)
+        toNp = int(direction/20)
 
         if direction < 180:
             direction = -(math.radians(direction))
@@ -40,7 +40,6 @@ class Map:
             direction = math.radians(360 - direction)
 
         return {"rads": direction, "dir": toNp}
-
 
 
 def main(args):
@@ -51,7 +50,6 @@ def main(args):
   print(map.getDirection(-3,75))
   print(map.getPoint(80,2))  
   print(map.getDirection(27,80))
-
 
 
 if __name__ == '__main__':
