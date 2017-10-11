@@ -9,9 +9,13 @@ class Map:
 
     def __init__(self):
         self.map = None
+        self.width = None
+        self.height = None
 
     def loadMap(self, name):
         self.map = np.loadtxt(open(name, "rb"), delimiter=",", skiprows=0)
+        self.height = self.map.shape[0]
+        self.width = self.map.shape[1]
 
     def toImage(self):
         rescaled = (255.0 / self.map.max() * (self.map - self.map.min())).astype(np.uint8) # (RGB)
@@ -19,14 +23,14 @@ class Map:
 
     def getPoint(self, x, y):
         if x < 0:
-          x = 81 + abs(x)
+          x = int(self.height/2) + abs(x)
         else:
-          x = 81 - x
+          x = int(self.height/2) - x
 
         if y < 0:
-          y = 80 + abs(y)
+          y = int(self.width/2) + abs(y)
         else:
-          y = 80 - y  
+          y = int(self.width/2) - y  
 
         return self.map[x][y]
 
@@ -45,7 +49,8 @@ class Map:
 def main(args):
   map = Map()
   map.loadMap("maps/pruebaAgua.csv")
-  map.toImage()
+  #map.toImage()
+
   print(map.getPoint(-3,75))
   print(map.getDirection(-3,75))
   print(map.getPoint(80,2))  
