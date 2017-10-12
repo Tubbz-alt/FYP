@@ -7,7 +7,7 @@ from math import inf
 
 quadrotor = Quadrotor()
 
-quadrotor.translate(-20, -60, 15)
+quadrotor.translate(-54, -51, 7)
 #quadrotor.rotate(0.0, 0.0, pi/2)
 
 ######## KEYBOARD ########
@@ -22,7 +22,7 @@ quadrotor.translate(-20, -60, 15)
 camera = VideoCamera() # H & W = 256
 
 camera.translate(0.32, 0.0, 0.0)
-camera.properties(cam_far=1000)
+camera.properties(cam_far=1000, cam_focal=15.0)
 quadrotor.append(camera)
 camera.add_interface('socket')
 
@@ -58,7 +58,7 @@ teleport.add_interface('socket')
 ######## ENVIRONMENT ########
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('models/plane.blend', fastmode=False)
-env.set_camera_location([-18.0, -60.0, 19.8])
+env = Environment('models/path.blend', fastmode=False)
+env.set_camera_location([-70, -60.0, 19.8])
 env.set_camera_rotation([1.09, 0, -1.14])
 

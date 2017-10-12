@@ -44,10 +44,11 @@ def teleport(quadTele):
 ############################################################    
 
 i = 0
-f = open('trainingData/data.txt','w')
+#f = open('trainingData/data.txt','w')
+pitchFactor = -0.077
 
 map = Map()
-map.loadMap("maps/pruebaAgua.csv")
+map.loadMap("maps/path.csv")
 
 with Morse() as morse:
     morse.deactivate('quadrotor.teleport')
@@ -64,11 +65,11 @@ with Morse() as morse:
         y = quadPose['y']
 
         direction = map.getDirection(round(x), round(y))
-        print("Location X,Y :({} , {}) Direction: {}".format(x, y, direction))
+        print("Location X,Y :({} , {}, {}) Direction: {}".format(x, y, quadPose['z'], direction))
 
         orientation = { "yaw": direction['rads'], \
-                        "pitch": 0, \
-                        "roll": 0, \
+                        "pitch": pitchFactor, \
+                        "roll": 0.0, \
                       }
         quadDir.publish(orientation)
 
@@ -82,14 +83,14 @@ with Morse() as morse:
         cv2.imshow("Quadrotor view", image)
 
         fileName = 'trainingData/'+str(i)+'.jpg'
-        cv2.imwrite(fileName, image)
-        f.write(fileName + ' ' + str(direction['dir']) + '\n')
+        #cv2.imwrite(fileName, image)
+        #f.write(fileName + ' ' + str(direction['dir']) + '\n')
 
         if cv2.waitKey(1) & 0xff == ord('q'):
             break
         
         if checkLimit(x, y):
-            teleport(quadTele)
+            None#teleport(quadTele)
 
         i = i + 1
 
