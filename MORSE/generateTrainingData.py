@@ -48,7 +48,7 @@ i = 0
 pitchFactor = -0.077
 
 map = Map()
-map.loadMap("maps/path.csv")
+map.loadMap("maps/forest.csv")
 
 with Morse() as morse:
     morse.deactivate('quadrotor.teleport')
@@ -65,7 +65,7 @@ with Morse() as morse:
         y = quadPose['y']
 
         direction = map.getDirection(round(x), round(y))
-        print("Location X,Y :({} , {}, {}) Direction: {}".format(x, y, quadPose['z'], direction))
+        print("Location X,Y :({} , {}) Direction: {}".format(x, y, direction))
 
         orientation = { "yaw": direction['rads'], \
                         "pitch": pitchFactor, \

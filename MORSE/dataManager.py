@@ -38,10 +38,14 @@ class dataManager:
         print(self.X.shape)
         print(self.Y.shape)
         
-    def saveDataSet(self):
-        None
-    def loadDataSet(self):
-        None
+    def saveDataSet(self, fileName):
+        np.savez_compressed(fileName, x=self.X, y=self.Y)
+
+    def loadDataSet(self, fileName):
+        tmp = np.load(fileName)
+        self.X = tmp['x']
+        self.Y = tmp['y']
+
     def getTrainingData(self, testSize = 0.1, randomState = 23):
         input_shape = (self.img_rows, self.img_cols, 3)
 

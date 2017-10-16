@@ -7,7 +7,7 @@ from math import inf
 
 quadrotor = Quadrotor()
 
-quadrotor.translate(-54, -51, 7)
+quadrotor.translate(-30, -16, 7)
 #quadrotor.rotate(0.0, 0.0, pi/2)
 
 ######## KEYBOARD ########
@@ -58,7 +58,7 @@ teleport.add_interface('socket')
 ######## ENVIRONMENT ########
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('models/path.blend', fastmode=False)
-env.set_camera_location([-70, -60.0, 19.8])
+env = Environment('models/forest.blend', fastmode=False)
+env.set_camera_location([-40, 24, 19.8])
 env.set_camera_rotation([1.09, 0, -1.14])
 
