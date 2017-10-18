@@ -7,10 +7,8 @@ from skimage import io, util
 
 class Map:
 
-    def __init__(self):
-        self.map = None
-        self.width = None
-        self.height = None
+    def __init__(self, name):
+        self.loadMap(name)
 
     def loadMap(self, name):
         self.map = np.loadtxt(open(name, "rb"), delimiter=",", skiprows=0)
@@ -47,8 +45,8 @@ class Map:
 
 
 def main(args):
-  map = Map()
-  map.loadMap("maps/pruebaAgua.csv")
+  map = Map(None)
+  #map.loadMap("maps/plane.csv")
   #map.toImage()
 
   print(map.getPoint(-3,75))

@@ -33,7 +33,7 @@ print(nb_epoch,'epochs')
 model = ResNet50(include_top=True, weights=None,
              input_tensor=None, input_shape=None,
              pooling=None,
-             classes=8)
+             classes=18)
 
 #optimizer = SGD(lr = 0.01,momentum=0.1,nesterov = False)
 
@@ -46,7 +46,7 @@ history = model.fit(X_train, Y_train, batch_size = batch_size, nb_epoch = nb_epo
 score = model.evaluate(X_test, Y_test, verbose = 1)
 
 # file name to save model
-filename = 'plane.h5'
+filename = 'forest.h5'
 
 # save network model
 model.save(filename)

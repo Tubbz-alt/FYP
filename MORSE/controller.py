@@ -15,9 +15,10 @@ import math
 class ControllerNode:
 
     def __init__(self):
-        self.model = load_model("plane8epochs.h5")
+        self.model = load_model("forest.h5")
         self.img_rows = 224
         self.img_cols = 224
+        self.pitchFactor = -0.077
       
     def imageCallback(self,camera):
         width = camera['width'] # 256 default
@@ -42,7 +43,7 @@ class ControllerNode:
         deg = prediction.argmax(1)[0] * 20
         rads = self.toRads(deg)
 
-        return { "yaw": rads, "pitch": 0, "roll": 0 }
+        return { "yaw": rads, "pitch": self.pitchFactor, "roll": 0 }
 
     def toRads(self, direction):
         if direction < 180:
