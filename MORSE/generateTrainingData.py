@@ -16,6 +16,7 @@ class DataNode:
         self.normalize = False
         self.saveToDisk = True
         self.pitchFactor = -0.077
+        self.normFactor = 10
         self.map = Map("maps/forest.csv")
         self.lapCounter = 0
         self.dataCounter = 0
@@ -31,6 +32,10 @@ class DataNode:
             return True
         else:
             return False
+
+    def checkNormalization(self):
+        if self.lapCounter > self.normFactor:
+            self.normalize = True
 
     def teleport(self, quadTele, morse):
         x = randint(-65, -45)
@@ -66,7 +71,9 @@ class DataNode:
         image = numpy.ndarray(shape=(height, width, 4), buffer=buff, dtype='uint8')
         image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
         # image = cv2.resize(image, (512, 512))
-        cv2.imshow("Quadrotor view", image)     
+        cv2.imshow("Quadrotor view", image)
+
+        return image     
 
     def save(self, image, direction):
         if self.normalize:
@@ -111,6 +118,7 @@ class DataNode:
                 
                 if self.checkLimit(x, y):
                     self.teleport(quadTele, morse)
+                    self.checkNormalization()
 
                 self.dataCounter = self.dataCounter + 1
 
