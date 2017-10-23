@@ -39,11 +39,11 @@ class Map:
         toNp = int(direction/20)
 
         if direction < 180:
-            direction = -(math.radians(direction))
+            rads = -(math.radians(direction))
         else: 
-            direction = math.radians(360 - direction)
+            rads = math.radians(360 - direction)
 
-        return {"rads": direction, "dir": toNp}
+        return {"rads": rads, "deg": direction, "dir": toNp}
 
 
 def main(args):

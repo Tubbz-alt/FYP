@@ -10,21 +10,29 @@ from math import pi
 from pymorse import Morse
 from random import randint
 
+
 class DataNode:
 
     def __init__(self):
+        self.saveDirection = False
         self.normalize = False
         self.saveToDisk = True
+        self.lastDirection = 0
+        self.lastNpDir = 0
+        self.lastPose = 0
         self.pitchFactor = -0.077
         self.normFactor = 10
         self.map = Map("maps/path.csv")
         self.lapCounter = 10
         self.dataCounter = 0
 
-    def startQuadrotor(self, quadVel):
-        vel = { "v": 2, \
-                "w": 0, \
-              }
+    def startQuadrotor(self, morse):
+        quadVel = morse.quadrotor.motion
+        quadPose = morse.quadrotor.pose.get()
+
+        self.lastDirection = self.map.getDirection(round(quadPose['x']), round(quadPose['y']))['deg']
+        vel = { "v": 2, "w": 0 }
+
         quadVel.publish(vel)
 
     def checkLimit(self, x, y):
@@ -59,7 +67,7 @@ class DataNode:
         self.lapCounter = self.lapCounter + 1
 
     def getOrientation(self, x, y, direction):
-        print("Location X,Y :({} , {}) Direction: {}".format(x, y, direction))
+        #print("Location X,Y :({} , {}) Direction: {}".format(x, y, direction))
 
         return { "yaw": direction['rads'], "pitch": self.pitchFactor, "roll": 0.0 }
 
@@ -73,14 +81,69 @@ class DataNode:
         # image = cv2.resize(image, (512, 512))
         cv2.imshow("Quadrotor view", image)
 
-        return image     
+        return image
 
-    def save(self, image, direction):
+    def poseChanged(self, quadPose):
+        newPose = round(quadPose['yaw'], 5)
+        print("LAST POSE: " + str(round(quadPose['yaw'], 6)) + " NEW POSE: " + str(newPose))
+        print("RESTA: " + str(abs(self.lastPose-newPose)))
+
+        if (abs(self.lastPose-newPose) > 0.00000):
+            print("POSE CHANGED")
+            self.lastPose = newPose
+            return True
+        else:
+            return False
+            
+    def dirToNp(self, newDir):
+        if newDir > 0:
+            if newDir > 20:
+                toNp = 4
+            else:
+                toNp = 3
+        elif newDir < 0:
+            if newDir < -20:
+                toNp = 1
+            else:
+                toNp = 2
+        else:
+            toNp = self.lastNpDir
+
+        self.lastNpDir = toNp
+
+        return toNp
+
+    def getTurningDir(self, direction, quadPose):
+        newDir =  -(self.lastDirection - direction['deg'])
+        print("LAST DIR: " + str(self.lastDirection))
+        print("ACTUAL DIR: " + str(direction['deg']))
+        print("NEW DIR: " + str(newDir))
+        
+        toNp = 0
+
+        if (self.poseChanged(quadPose)):
+            self.lastDirection = direction['deg']
+            toNp = self.dirToNp(newDir)
+
+        print("Direccion: " + str(toNp))
+        self.lastNpDir = toNp
+
+        return toNp
+
+    def save(self, image, direction, pose):
+        if self.saveDirection:
+            self.checkSave(image, direction['dir'])
+        else:
+            self.checkSave(image, self.getTurningDir(direction, pose))
+
+
+    def checkSave(self, image, direction):
         if self.normalize:
             if direction != 0:
                self.writeFile(image, direction) 
         else:
             self.writeFile(image, direction)
+
 
     def writeFile(self, image, direction):
         fileName = 'trainingData/' + str(self.dataCounter) + '.jpg'
@@ -94,10 +157,9 @@ class DataNode:
         with Morse() as morse:
             morse.deactivate('quadrotor.teleport')
             quadTele = morse.quadrotor.teleport
-            quadVel = morse.quadrotor.motion
             quadDir = morse.quadrotor.orientation
             
-            self.startQuadrotor(quadVel)
+            self.startQuadrotor(morse)
 
             while True:
                 camera = morse.quadrotor.camera.get()
@@ -112,7 +174,7 @@ class DataNode:
                 image = self.imageCallback(camera)
 
                 if self.saveToDisk:
-                    self.save(image, direction['dir'])
+                    self.save(image, direction, quadPose)
 
                 if cv2.waitKey(1) & 0xff == ord('q'):
                     break
