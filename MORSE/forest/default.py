@@ -2,13 +2,13 @@
 # Created by: Miguel Sancho
 
 from morse.builder import *
-from math import inf
+from math import pi
 
 
 quadrotor = Quadrotor()
 
-quadrotor.translate(-50, -12, 7)
-#quadrotor.rotate(0.0, 0.0, pi/2)
+quadrotor.translate(-50, -57, 5)
+quadrotor.rotate(0.0, 0.0, pi/2)
 
 ######## KEYBOARD ########
 
@@ -58,7 +58,9 @@ teleport.add_interface('socket')
 ######## ENVIRONMENT ########
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('models/forest.blend', fastmode=False)
-env.set_camera_location([0, 0, 120])
-env.set_camera_rotation([0, 0, -1.57])
+env = Environment('models/path.blend', fastmode=False)
+#env.set_camera_location([0, 0, 120])
+#env.set_camera_rotation([0, 0, -1.57])
+env.set_camera_location([-55, -50, 10])
+env.set_camera_rotation([1.57, 0, -1.57])
 env.set_camera_clip(clip_start=0.1, clip_end=800)

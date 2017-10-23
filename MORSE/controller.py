@@ -6,6 +6,7 @@ import PIL.Image, PIL.ImageOps
 import numpy as np
 from keras import backend as K
 from keras.models import load_model
+from random import randint
 import sys
 import cv2
 import base64
@@ -15,7 +16,7 @@ import math
 class ControllerNode:
 
     def __init__(self):
-        self.model = load_model("forest.h5")
+        self.model = load_model("path.h5")
         self.img_rows = 224
         self.img_cols = 224
         self.pitchFactor = -0.077
@@ -37,11 +38,38 @@ class ControllerNode:
         vel = { "v": 2, "w": 0 }
         quadVel.publish(vel)
 
+    def checkLimit(self, x, y):
+        if x > 40:
+            return True
+        else:
+            return False    
+
+    def teleport(self, quadTele, morse):
+        x = randint(-65, -45)
+        y = randint(-51, 51)
+
+        morse.deactivate('quadrotor.motion')
+        morse.activate('quadrotor.teleport')
+
+        destination = { "x": x, \
+                        "y": y, \
+                        "z": 7, \
+                        "yaw": 0, \
+                        "pitch": 0, \
+                        "roll": 0, \
+                       }
+        quadTele.publish(destination)
+        
+        morse.deactivate('quadrotor.teleport')
+        morse.activate('quadrotor.motion')
+
     def predict(self, data):
         image = np.array(data).reshape(1, self.img_rows, self.img_cols, 3)
         prediction = self.model.predict(image)
         deg = prediction.argmax(1)[0] * 20
         rads = self.toRads(deg)
+
+        print("direction: " + str(deg))
 
         return { "yaw": rads, "pitch": self.pitchFactor, "roll": 0 }
 
@@ -57,6 +85,7 @@ class ControllerNode:
     def run(self):
         with Morse() as morse:
             morse.deactivate('quadrotor.teleport')
+            quadTele = morse.quadrotor.teleport
             quadVel = morse.quadrotor.motion
             quadDir = morse.quadrotor.orientation
             
@@ -66,12 +95,17 @@ class ControllerNode:
                 camera = morse.quadrotor.camera.get()
                 image = self.imageCallback(camera)
                 orientation = self.predict(image)
-                print(orientation)
+                quadPose = morse.quadrotor.pose.get()
+                x = quadPose['x']
+                y = quadPose['y']
 
                 quadDir.publish(orientation)
                 
                 if cv2.waitKey(1) & 0xff == ord('q'):
                     break
+
+                if self.checkLimit(x, y):
+                    self.teleport(quadTele, morse)
 
         cv2.destroyAllWindows()
 

@@ -8,7 +8,9 @@ from skimage import io, util
 class Map:
 
     def __init__(self, name):
-        self.loadMap(name)
+        self.map = np.loadtxt(open(name, "rb"), delimiter=",", skiprows=0)
+        self.height = self.map.shape[0]
+        self.width = self.map.shape[1]
 
     def loadMap(self, name):
         self.map = np.loadtxt(open(name, "rb"), delimiter=",", skiprows=0)
@@ -30,7 +32,7 @@ class Map:
         else:
           y = int(self.width/2) - y  
 
-        return self.map[x][y]
+        return self.map[x-1][y-1]
 
     def getDirection(self, x, y):
         direction = self.getPoint(x, y)
@@ -45,14 +47,12 @@ class Map:
 
 
 def main(args):
-  map = Map(None)
+  map = Map("maps/forest.csv")
   #map.loadMap("maps/plane.csv")
   #map.toImage()
 
-  print(map.getPoint(-3,75))
-  print(map.getDirection(-3,75))
-  print(map.getPoint(80,2))  
-  print(map.getDirection(27,80))
+  print(map.getPoint(0,8))
+
 
 
 if __name__ == '__main__':

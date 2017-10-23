@@ -17,8 +17,8 @@ class DataNode:
         self.saveToDisk = True
         self.pitchFactor = -0.077
         self.normFactor = 10
-        self.map = Map("maps/forest.csv")
-        self.lapCounter = 0
+        self.map = Map("maps/path.csv")
+        self.lapCounter = 10
         self.dataCounter = 0
 
     def startQuadrotor(self, quadVel):
@@ -28,7 +28,7 @@ class DataNode:
         quadVel.publish(vel)
 
     def checkLimit(self, x, y):
-        if x > 40:
+        if x > 60:
             return True
         else:
             return False
@@ -38,8 +38,8 @@ class DataNode:
             self.normalize = True
 
     def teleport(self, quadTele, morse):
-        x = randint(-65, -45)
-        y = randint(-51, 51)
+        x = -54#randint(-65, -45)
+        y = -57#randint(-51, 51)
 
         morse.deactivate('quadrotor.motion')
         morse.activate('quadrotor.teleport')
@@ -47,7 +47,7 @@ class DataNode:
         destination = { "x": x, \
                         "y": y, \
                         "z": 7, \
-                        "yaw": 0, \
+                        "yaw": pi/2, \
                         "pitch": 0, \
                         "roll": 0, \
                        }
@@ -78,17 +78,18 @@ class DataNode:
     def save(self, image, direction):
         if self.normalize:
             if direction != 0:
-                fileName = 'trainingData/' + str(self.dataCounter) + '.jpg'
-                cv2.imwrite(fileName, image)
-                self.f.write(fileName + ' ' + str(direction) + '\n')
+               self.writeFile(image, direction) 
         else:
-            fileName = 'trainingData/' + str(self.dataCounter) + '.jpg'
-            cv2.imwrite(fileName, image)
-            self.f.write(fileName + ' ' + str(direction) + '\n')
-           
+            self.writeFile(image, direction)
+
+    def writeFile(self, image, direction):
+        fileName = 'trainingData/' + str(self.dataCounter) + '.jpg'
+        cv2.imwrite(fileName, image)
+        self.f.write(fileName + ' ' + str(direction) + '\n')
+   
     def run(self):
         if self.saveToDisk:
-            self.f = open('trainingData/data.txt','w')
+            self.f = open('trainingData/data.txt','a')
         
         with Morse() as morse:
             morse.deactivate('quadrotor.teleport')
