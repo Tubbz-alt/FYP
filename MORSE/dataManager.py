@@ -33,7 +33,7 @@ class dataManager:
         print("total images: {}".format(n))
 
         self.X = np.asarray(image_list).reshape(n,self.img_rows,self.img_cols,3)
-        self.Y = np_utils.to_categorical(np.asarray(output_list), 18)
+        self.Y = np_utils.to_categorical(np.asarray(output_list), 5)
 
         print(self.X.shape)
         print(self.Y.shape)

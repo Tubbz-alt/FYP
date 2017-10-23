@@ -114,7 +114,9 @@ class DataNode:
         return toNp
 
     def getTurningDir(self, direction, quadPose):
-        newDir =  -(self.lastDirection - direction['deg'])
+        newDir =  (self.lastDirection - direction['deg'])
+        if abs(newDir) < 180:
+            newDir = -newDir
         print("LAST DIR: " + str(self.lastDirection))
         print("ACTUAL DIR: " + str(direction['deg']))
         print("NEW DIR: " + str(newDir))

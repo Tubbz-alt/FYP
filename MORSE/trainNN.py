@@ -18,7 +18,7 @@ from resnet50 import *
 
 
 batch_size = 30
-classes = 18
+classes = 5
 nb_epoch = 50
 dataManager = dataManager()
 dataManager.newDataSet()

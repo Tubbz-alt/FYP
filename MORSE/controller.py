@@ -20,6 +20,7 @@ class ControllerNode:
         self.img_rows = 224
         self.img_cols = 224
         self.pitchFactor = -0.077
+        self.useDirection = False
       
     def imageCallback(self,camera):
         width = camera['width'] # 256 default
@@ -66,18 +67,35 @@ class ControllerNode:
     def predict(self, data):
         image = np.array(data).reshape(1, self.img_rows, self.img_cols, 3)
         prediction = self.model.predict(image)
-        deg = prediction.argmax(1)[0] * 20
-        rads = self.toRads(deg)
+        rads = self.toRads(prediction)
 
         print("direction: " + str(deg))
 
         return { "yaw": rads, "pitch": self.pitchFactor, "roll": 0 }
 
-    def toRads(self, direction):
+    def getTurningDirection(pred):
+        if (pred < 3):
+            direction = -(math.radians(pred * 20))
+        else:
+            direction = -(math.radians((pred - 2) * 20))
+
+    def getOrientation(pred):
+        direction = pred * 20
+
         if direction < 180:
             direction = -(math.radians(direction))
         else: 
             direction = math.radians(360 - direction)
+
+        return direction
+
+    def toRads(self, prediction):
+        pred = prediction.argmax(1)[0]
+        
+        if self.useDirection:
+            direction = getOrientation(pred) # using full 360 degrees
+        else:
+            direction = getTurningDirection(pred) # using left/right turns
 
         return direction
 
