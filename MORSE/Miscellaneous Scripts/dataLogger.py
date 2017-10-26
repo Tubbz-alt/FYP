@@ -26,6 +26,8 @@ class DataNode:
         self.map = Map("maps/forest.csv")
         self.lapCounter = 0
         self.dataCounter = 0
+        self.zeroDir = 0
+        self.otherDir = 0
 
     def startQuadrotor(self, morse):
         quadVel = morse.quadrotor.motion
@@ -47,6 +49,8 @@ class DataNode:
             self.normalize = True
 
     def teleport(self, quadTele, morse):
+        self.f.write(str(self.lapCounter) + ',' + str(self.zeroDir) + ',' + str(self.otherDir) + '\n')
+        x = randint(-65, -45)
         x = randint(-65, -45)
         y = randint(-51, 51)
         #x = randint(-56, -53)
@@ -88,11 +92,9 @@ class DataNode:
 
     def poseChanged(self, quadPose):
         newPose = round(quadPose['yaw'], 5)
-        print("LAST POSE: " + str(round(quadPose['yaw'], 6)) + " NEW POSE: " + str(newPose))
-        print("RESTA: " + str(abs(self.lastPose-newPose)))
 
         if (abs(self.lastPose-newPose) > 0.00000):
-            print("POSE CHANGED")
+
             self.poseHasChanged = True
             self.lastPose = newPose
             return True
@@ -122,17 +124,11 @@ class DataNode:
         newDir =  (self.lastDirection - direction['deg'])
         if abs(newDir) < 180:
             newDir = -newDir
-        print("LAST DIR: " + str(self.lastDirection))
-        print("ACTUAL DIR: " + str(direction['deg']))
-        print("NEW DIR: " + str(newDir))
-        
         toNp = 0
 
         if (self.poseChanged(quadPose)):
             self.lastDirection = direction['deg']
             toNp = self.dirToNp(newDir)
-
-        print("Direccion: " + str(toNp))
         self.lastNpDir = toNp
 
         return toNp
@@ -151,15 +147,8 @@ class DataNode:
         else:
             self.writeFile(image, direction)
 
-
-    def writeFile(self, image, direction):
-        fileName = 'trainingData/' + str(self.dataCounter) + '.jpg'
-        cv2.imwrite(fileName, image)
-        self.f.write(fileName + ' ' + str(direction) + '\n')
-   
     def run(self):
-        if self.saveToDisk:
-            self.f = open('trainingData/data.txt','a')
+        self.f = open('dataLogger.txt','a')
         
         with Morse() as morse:
             morse.deactivate('quadrotor.teleport')
@@ -169,12 +158,17 @@ class DataNode:
             self.startQuadrotor(morse)
 
             while True:
+                print("Iteration: " + str(self.dataCounter))
                 camera = morse.quadrotor.camera.get()
                 quadPose = morse.quadrotor.pose.get()
                 x = quadPose['x']
                 y = quadPose['y']
 
                 direction = self.map.getDirection(round(x), round(y))
+                if direction['dir'] > 0:
+                    self.otherDir += 1
+                else:
+                    self.zeroDir += 1
                 orientation = self.getOrientation(x, y, direction)
                 quadDir.publish(orientation)
 
@@ -190,7 +184,7 @@ class DataNode:
                     self.teleport(quadTele, morse)
                     self.checkNormalization()
 
-                self.dataCounter = self.dataCounter + 1
+                self.dataCounter += 1
 
         cv2.destroyAllWindows()
 

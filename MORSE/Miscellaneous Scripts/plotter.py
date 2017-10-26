@@ -88,11 +88,9 @@ class DataNode:
 
     def poseChanged(self, quadPose):
         newPose = round(quadPose['yaw'], 5)
-        print("LAST POSE: " + str(round(quadPose['yaw'], 6)) + " NEW POSE: " + str(newPose))
-        print("RESTA: " + str(abs(self.lastPose-newPose)))
 
         if (abs(self.lastPose-newPose) > 0.00000):
-            print("POSE CHANGED")
+
             self.poseHasChanged = True
             self.lastPose = newPose
             return True
@@ -122,17 +120,11 @@ class DataNode:
         newDir =  (self.lastDirection - direction['deg'])
         if abs(newDir) < 180:
             newDir = -newDir
-        print("LAST DIR: " + str(self.lastDirection))
-        print("ACTUAL DIR: " + str(direction['deg']))
-        print("NEW DIR: " + str(newDir))
-        
         toNp = 0
 
         if (self.poseChanged(quadPose)):
             self.lastDirection = direction['deg']
             toNp = self.dirToNp(newDir)
-
-        print("Direccion: " + str(toNp))
         self.lastNpDir = toNp
 
         return toNp
@@ -152,14 +144,12 @@ class DataNode:
             self.writeFile(image, direction)
 
 
-    def writeFile(self, image, direction):
-        fileName = 'trainingData/' + str(self.dataCounter) + '.jpg'
-        cv2.imwrite(fileName, image)
-        self.f.write(fileName + ' ' + str(direction) + '\n')
+    def plot(self, x, y):
+        if self.dataCounter % 2 == 0:
+            self.f.write(str(int(x)) + ' ' + str(int(y)) + '\n')
    
     def run(self):
-        if self.saveToDisk:
-            self.f = open('trainingData/data.txt','a')
+        self.f = open('pathPlots.txt','a')
         
         with Morse() as morse:
             morse.deactivate('quadrotor.teleport')
@@ -169,6 +159,7 @@ class DataNode:
             self.startQuadrotor(morse)
 
             while True:
+                print("Iteration: " + str(self.dataCounter) + " Lap: " + str(self.lapCounter))
                 camera = morse.quadrotor.camera.get()
                 quadPose = morse.quadrotor.pose.get()
                 x = quadPose['x']
@@ -189,6 +180,7 @@ class DataNode:
                 if self.checkLimit(x, y):
                     self.teleport(quadTele, morse)
                     self.checkNormalization()
+                self.plot(x, y)
 
                 self.dataCounter = self.dataCounter + 1
 

@@ -3,7 +3,7 @@
 import sys
 import numpy as np
 import math
-from skimage import io, util
+from scipy.misc import imresize, imsave
 
 class Map:
 
@@ -19,7 +19,8 @@ class Map:
 
     def toImage(self):
         rescaled = (255.0 / self.map.max() * (self.map - self.map.min())).astype(np.uint8) # (RGB)
-        io.imsave('tmp.tif', rescaled)
+        resized = imresize(rescaled, [1000, 1000])
+        imsave('tmp.tif', resized)
 
     def getPoint(self, x, y):
         if x < 0:
@@ -49,7 +50,7 @@ class Map:
 def main(args):
   map = Map("maps/forest.csv")
   #map.loadMap("maps/plane.csv")
-  #map.toImage()
+  map.toImage()
 
   print(map.getPoint(0,8))
 

@@ -33,7 +33,7 @@ print(nb_epoch,'epochs')
 model = ResNet50(include_top=True, weights=None,
              input_tensor=None, input_shape=None,
              pooling=None,
-             classes=18)
+             classes=5)
 
 #optimizer = SGD(lr = 0.01,momentum=0.1,nesterov = False)
 filepath = "weights-improvement-{epoch:02d}-{val_acc:.2f}.h5"

@@ -16,7 +16,7 @@ import math
 class ControllerNode:
 
     def __init__(self):
-        self.model = load_model("path.h5")
+        self.model = load_model("forest.h5")
         self.img_rows = 224
         self.img_cols = 224
         self.pitchFactor = -0.077
@@ -37,6 +37,7 @@ class ControllerNode:
 
     def startQuadrotor(self, quadVel):
         vel = { "v": 2, "w": 0 }
+        
         quadVel.publish(vel)
 
     def checkLimit(self, x, y):
@@ -64,22 +65,33 @@ class ControllerNode:
         morse.deactivate('quadrotor.teleport')
         morse.activate('quadrotor.motion')
 
+
     def predict(self, data):
         image = np.array(data).reshape(1, self.img_rows, self.img_cols, 3)
-        prediction = self.model.predict(image)
-        rads = self.toRads(prediction)
+        predict = self.model.predict(image)
+        rads = self.toRads(predict)
 
-        print("direction: " + str(deg))
-
-        return { "yaw": rads, "pitch": self.pitchFactor, "roll": 0 }
-
-    def getTurningDirection(pred):
-        if (pred < 3):
-            direction = -(math.radians(pred * 20))
+        if self.useDirection:
+            prediction = { "yaw": rads, "pitch": self.pitchFactor, "roll": 0 }
         else:
-            direction = -(math.radians((pred - 2) * 20))
+            prediction = { "v": 2, "w": rads }
+            
+        return prediction
 
-    def getOrientation(pred):
+    def getTurningDirection(self, pred):
+        if pred < 1:
+            direction = 0
+            print("Going Straight")
+        elif pred < 3:
+            direction = -(math.radians((pred * 20)))
+            print("Turning Left " + str(direction) + "rads")
+        else:
+            direction = (math.radians((pred - 2) * 20))
+            print("Turning Right " + str(direction) + "rads")
+
+        return direction
+
+    def getOrientation(self, pred):
         direction = pred * 20
 
         if direction < 180:
@@ -93,11 +105,16 @@ class ControllerNode:
         pred = prediction.argmax(1)[0]
         
         if self.useDirection:
-            direction = getOrientation(pred) # using full 360 degrees
+            direction = self.getOrientation(pred) # using full 360 degrees
         else:
-            direction = getTurningDirection(pred) # using left/right turns
+            direction = self.getTurningDirection(pred) # using left/right turns
 
         return direction
+
+    def stabilizeAltitude(self, morse, quadDir):
+        quadPose = morse.quadrotor.pose.get()
+
+        quadDir.publish({ "yaw": quadPose['yaw'], "pitch": self.pitchFactor, "roll": 0 })
 
 
     def run(self):
@@ -114,15 +131,18 @@ class ControllerNode:
                 image = self.imageCallback(camera)
                 orientation = self.predict(image)
                 quadPose = morse.quadrotor.pose.get()
-                x = quadPose['x']
-                y = quadPose['y']
-
-                quadDir.publish(orientation)
                 
+                if self.useDirection:
+                    quadDir.publish(orientation)
+                else:
+                    quadVel.publish(orientation)
+                    self.stabilizeAltitude(morse, quadDir)
+                    
+
                 if cv2.waitKey(1) & 0xff == ord('q'):
                     break
 
-                if self.checkLimit(x, y):
+                if self.checkLimit(quadPose['x'], quadPose['y']):
                     self.teleport(quadTele, morse)
 
         cv2.destroyAllWindows()

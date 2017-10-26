@@ -7,8 +7,8 @@ from math import pi
 
 quadrotor = Quadrotor()
 
-quadrotor.translate(-50, -57, 5)
-quadrotor.rotate(0.0, 0.0, pi/2)
+quadrotor.translate(-60, 4, 7)
+#quadrotor.rotate(0.0, 0.0, pi/2)
 
 ######## KEYBOARD ########
 
@@ -34,11 +34,11 @@ quadrotor.append(pose)
 pose.add_interface('socket')
 
 ######## MOTION HANDLER ########
-
 motion = MotionVW()
 
 quadrotor.append(motion)
 motion.add_interface('socket')
+
 
 ######## ORIENTATION HANDLER ########
 
@@ -58,7 +58,7 @@ teleport.add_interface('socket')
 ######## ENVIRONMENT ########
 
 # set 'fastmode' to True to switch to wireframe mode
-env = Environment('models/path.blend', fastmode=False)
+env = Environment('models/forest.blend', fastmode=False)
 #env.set_camera_location([0, 0, 120])
 #env.set_camera_rotation([0, 0, -1.57])
 env.set_camera_location([-55, -50, 10])
