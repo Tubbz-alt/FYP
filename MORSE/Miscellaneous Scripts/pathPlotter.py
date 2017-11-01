@@ -1,3 +1,5 @@
+#Created by: Miguel Sancho
+
 import matplotlib.pyplot as plt
 
 f = open("paths.txt","r")

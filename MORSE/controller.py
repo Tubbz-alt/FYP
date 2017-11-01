@@ -16,11 +16,14 @@ import math
 class ControllerNode:
 
     def __init__(self):
-        self.model = load_model("forest.h5")
+        self.forestModel = load_model("forest.h5")
+        self.behaviourModel = load_model("behaviour.h5")
         self.img_rows = 224
         self.img_cols = 224
         self.pitchFactor = -0.077
-        self.useDirection = False
+        self.useOrientation = False
+        self.lastBehaviour = 0
+        self.iteration = 0
       
     def imageCallback(self,camera):
         width = camera['width'] # 256 default
@@ -65,13 +68,37 @@ class ControllerNode:
         morse.deactivate('quadrotor.teleport')
         morse.activate('quadrotor.motion')
 
+    def predictBehaviour(self, image):
+        behaviour = self.behaviourModel.predict(image).argmax(1)[0]
+        self.lastBehaviour = behaviour
+
+        if behaviour < 1:
+            print("FOREST")
+        else:
+            print("PATH")
+
+        return behaviour
+
+    def predictAction(self, behaviour, image):
+        if behaviour < 1:
+            action = self.forestModel.predict(image)
+        else:
+            None
+
+        return action
 
     def predict(self, data):
         image = np.array(data).reshape(1, self.img_rows, self.img_cols, 3)
-        predict = self.model.predict(image)
-        rads = self.toRads(predict)
 
-        if self.useDirection:
+        if self.iteration % 5 == 0:
+            behaviour = self.predictBehaviour(image)
+        else: 
+            behaviour = self.lastBehaviour
+
+        action = self.predictAction(behaviour, image)
+        rads = self.toRads(action)
+
+        if self.useOrientation:
             prediction = { "yaw": rads, "pitch": self.pitchFactor, "roll": 0 }
         else:
             prediction = { "v": 2, "w": rads }
@@ -104,7 +131,7 @@ class ControllerNode:
     def toRads(self, prediction):
         pred = prediction.argmax(1)[0]
         
-        if self.useDirection:
+        if self.useOrientation:
             direction = self.getOrientation(pred) # using full 360 degrees
         else:
             direction = self.getTurningDirection(pred) # using left/right turns
@@ -116,7 +143,7 @@ class ControllerNode:
 
         quadDir.publish({ "yaw": quadPose['yaw'], "pitch": self.pitchFactor, "roll": 0 })
 
-
+    
     def run(self):
         with Morse() as morse:
             morse.deactivate('quadrotor.teleport')
@@ -132,7 +159,7 @@ class ControllerNode:
                 orientation = self.predict(image)
                 quadPose = morse.quadrotor.pose.get()
                 
-                if self.useDirection:
+                if self.useOrientation:
                     quadDir.publish(orientation)
                 else:
                     quadVel.publish(orientation)
@@ -144,6 +171,8 @@ class ControllerNode:
 
                 if self.checkLimit(quadPose['x'], quadPose['y']):
                     self.teleport(quadTele, morse)
+
+                self.iteration += 1
 
         cv2.destroyAllWindows()
 

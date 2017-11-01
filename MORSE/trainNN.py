@@ -18,7 +18,8 @@ from resnet50 import *
 
 
 batch_size = 30
-classes = 5
+#classes = 5
+classes = 2
 nb_epoch = 50
 dataManager = dataManager()
 dataManager.newDataSet()
@@ -48,7 +49,7 @@ history = model.fit(X_train, Y_train, batch_size = batch_size, epochs = nb_epoch
 score = model.evaluate(X_test, Y_test, verbose = 1)
 
 # file name to save model
-filename = 'plane.h5'
+filename = 'behaviour.h5'
 
 # save network model
 model.save(filename)

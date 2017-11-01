@@ -7,7 +7,7 @@ from math import pi
 
 quadrotor = Quadrotor()
 
-quadrotor.translate(-60, 4, 7)
+quadrotor.translate(-60, 4, 7) 
 #quadrotor.rotate(0.0, 0.0, pi/2)
 
 ######## KEYBOARD ########
